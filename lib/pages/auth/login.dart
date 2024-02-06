@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:authentication/models/login_request_model.dart';
+import 'package:authentication/models/login_response_model.dart';
+import 'package:authentication/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -13,6 +16,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isAPICallProcess = false;
+  bool hidePassword = true;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +41,20 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 16.0),
             TextField(
               controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
+              obscureText: hidePassword,
+              decoration: InputDecoration(
                 labelText: 'Password',
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      hidePassword = !hidePassword;
+                    });
+                  },
+                  icon: Icon(hidePassword ? Icons.visibility_off : Icons.visibility),
+                ),
               ),
             ),
+
             const SizedBox(height: 24.0),
             ElevatedButton(
               onPressed: () => _loginPressed(context),
@@ -55,53 +71,14 @@ class _LoginPageState extends State<LoginPage> {
     String password = _passwordController.text;
 
     if (username.isNotEmpty && password.isNotEmpty) {
-      var url = "your_login_url"; // Replace with your actual login URL
-      var reqBody = {
-        "email": username,
-        "password": password,
-      };
-
-      try {
-        var response = await http.post(
-          Uri.parse(url),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode(reqBody),
-        );
-
-        if (response.statusCode == 200) {
-          var jsonResponse = jsonDecode(response.body);
-
-          if (jsonResponse["success"]) {
-            // Successful login
-            showDialog(
-              context: context,
-              builder: (BuildContext context){
-                return AlertDialog(
-                  title: const Text('Login Successful'),
-                  content: Text('Welcome, $username!'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('OK'),
-                    ),
-                  ],
-                );
-              },
-            );
-          } else {
-            // Handle unsuccessful login
-            _showErrorDialog(context, 'Login Failed', 'Invalid username or password.');
-          }
-        } else {
-          // Handle non-200 status code
-          _showErrorDialog(context, 'Error', 'Failed to connect to the server. Please try again later.');
+      LoginRequestModel model = LoginRequestModel(email: username, password: password);
+      APIService.login(model).then((response){
+        if(response){
+          Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+        }else{
+          _showErrorDialog(context, "Invalid username/password", "Please enter valid user name and password");
         }
-      } catch (e) {
-        // Handle network or other errors
-        _showErrorDialog(context, 'Error', 'An unexpected error occurred. Please try again.');
-      }
+      });
     } else {
       // Handle empty username or password
       _showErrorDialog(context, 'Login Failed', 'Please enter both username and password.');

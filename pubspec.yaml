@@ -38,6 +38,7 @@ dependencies:
   http: ^1.2.0
   shared_preferences: ^2.2.2
   jwt_decoder: ^2.0.1
+  api_cache_manager: ^1.0.1
 
 
 dev_dependencies:

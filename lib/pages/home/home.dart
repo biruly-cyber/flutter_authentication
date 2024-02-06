@@ -6,6 +6,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Material(
+      child: Center(
+        child: Text("HOME PAGE"),
+      ),
+    );
   }
 }
