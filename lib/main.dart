@@ -1,9 +1,19 @@
+import 'package:authentication/pages/admin/employee.dart';
 import 'package:authentication/pages/auth/login.dart';
 import 'package:authentication/pages/home/home.dart';
+import 'package:authentication/services/shared_service.dart';
 import 'package:authentication/utils/routes.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+
+Widget _defaultHome = const LoginPage();
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  bool result = await  SharedService.isLoggedIn();
+  if(result){
+    _defaultHome =  const AddEmployeePage();
+  }
   runApp(const MyApp());
 }
 
@@ -20,9 +30,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: MyRoutes.loginPage,
       routes: {
-        "/": (context) => const LoginPage(),
+        "/": (context) => _defaultHome,
         MyRoutes.homePage : (context) => const HomePage(),
         MyRoutes.loginPage: (context)=> const LoginPage()
       },

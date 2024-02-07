@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:authentication/models/login_request_model.dart';
 import 'package:authentication/models/login_response_model.dart';
-import 'package:authentication/services/api_service.dart';
+import 'package:authentication/services/user_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (username.isNotEmpty && password.isNotEmpty) {
       LoginRequestModel model = LoginRequestModel(email: username, password: password);
-      APIService.login(model).then((response){
+      UserAPIService.login(model).then((response){
         if(response){
           Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
         }else{

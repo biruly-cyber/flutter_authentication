@@ -7,10 +7,10 @@ import 'package:authentication/models/login_response_model.dart';
 import 'package:authentication/services/shared_service.dart';
 import 'package:http/http.dart' as http;
 
-class APIService {
+class UserAPIService {
   static var client =  http.Client();
 
-   // login api request
+  // login api request
   static Future<bool> login(LoginRequestModel model) async{
     Map<String, String> requestHeaders ={
       'Content-Type': 'application/json'
@@ -26,6 +26,34 @@ class APIService {
       return true;
     }else{
       return false;
+    }
+  }
+
+  //get profile
+  static Future<String> getProfile() async {
+    var loginDetails = await SharedService.loginDetails();
+
+    var token = loginDetails!.token;
+
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Cookie': 'token=$token',
+    };
+
+    var url = Uri.http(Config.apiURL, Config.profile);
+
+    try {
+      var response = await http.get(url, headers: requestHeaders);
+
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        // Handle non-200 status codes
+        return ""; // You might want to throw an exception or handle the error in some way
+      }
+    } catch (e) {
+      // Handle network or unexpected errors
+      return ""; // You might want to throw an exception or handle the error in some way
     }
   }
 }
